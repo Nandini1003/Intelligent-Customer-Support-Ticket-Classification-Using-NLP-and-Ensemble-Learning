@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Customer Support Ticket Classifier</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f6f8;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 40px auto;
+            background: #fff;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+
+        textarea {
+            width: 100%;
+            height: 100px;
+            padding: 12px;
+            font-size: 15px;
+            border-radius: 6px;
+            border: 1px solid #ccc;
+            resize: none;
+        }
+
+        button {
+            margin-top: 15px;
+            padding: 12px 25px;
+            font-size: 16px;
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #0056b3;
+        }
+
+        .result {
+            margin-top: 30px;
+        }
+
+        /* ===== Result Card ===== */
+        .result-card {
+            display: flex;
+            gap: 15px;
+            background: linear-gradient(135deg, #e8f5e9, #f1fff4);
+            border-left: 6px solid #2e7d32;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 15px;
+        }
+
+        .result-icon {
+            font-size: 30px;
+        }
+
+        .result-card h2 {
+            margin: 0;
+            font-size: 28px;
+            color: #1b5e20;
+        }
+
+        .result-sub {
+            font-weight: 500;
+            color: #2e7d32;
+            margin-top: 5px;
+        }
+
+        .result-meta {
+            font-size: 13px;
+            color: #555;
+            margin-top: 4px;
+        }
+
+        /* ===== Decision Logic ===== */
+        .decision-box {
+            background: #fafafa;
+            border-radius: 8px;
+            padding: 12px 16px;
+            font-size: 13px;
+            color: #444;
+            margin-bottom: 20px;
+        }
+
+        /* ===== Section Titles ===== */
+        .section-title {
+            margin-top: 20px;
+            font-size: 16px;
+            color: #2e7d32;
+        }
+
+        .section-title.muted {
+            color: #999;
+        }
+
+        /* ===== Model Cards ===== */
+        .model-card {
+            margin-top: 12px;
+            padding: 12px;
+            border-radius: 6px;
+            background: #f8f9fa;
+            border-left: 6px solid #ccc;
+        }
+
+        .high { border-left-color: #28a745; }
+        .medium { border-left-color: #ffc107; }
+        .low { border-left-color: #ffb300; }
+
+        .confidence-bar {
+            height: 8px;
+            background: #ddd;
+            border-radius: 5px;
+            overflow: hidden;
+            margin-top: 6px;
+        }
+
+        .confidence-fill {
+            height: 100%;
+        }
+
+        .green { background: #28a745; }
+        .yellow { background: #ffc107; }
+        .amber { background: #ffb300; }
+
+        .cnn-note {
+            font-size: 12px;
+            color: #8d6e63;
+            margin-top: 4px;
+        }
+
+        footer {
+            margin-top: 35px;
+            text-align: center;
+            font-size: 12px;
+            color: #777;
+        }
+    </style>
+</head>
+
+<body>
+<div class="container">
+    <h1>Customer Support Ticket Classifier</h1>
+
+    <textarea id="ticket" placeholder="Type a customer issue..."></textarea>
+    <br>
+    <button onclick="classifyTicket()">Classify Ticket</button>
+
+    <div class="result" id="result"></div>
+
+    <footer>
+        Built with NLP ensemble models: TF-IDF + Logistic Regression, SVM, ANN, CNN
+    </footer>
+</div>
+
+<script>
+async function classifyTicket() {
+    const message = document.getElementById("ticket").value;
+
+    const response = await fetch("http://127.0.0.1:5000/predict", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ message })
+    });
+
+    const data = await response.json();
+
+    if (data.error) {
+        document.getElementById("result").innerHTML = data.error;
+        return;
+    }
+
+    let html = `
+        <div class="result-card">
+            <div class="result-icon">🎯</div>
+            <div>
+                <h2>${data.final_prediction}</h2>
+                <div class="result-sub">
+                    Decision via majority vote from high-confidence models
+                </div>
+                <div class="result-meta">
+                    Models used: ${data.decision_method} • Cluster: ${data.cluster_label}
+                </div>
+            </div>
+        </div>
+
+        <div class="decision-box">
+            <strong>Decision Logic</strong><br>
+            Models with confidence ≥ 70% participate in voting.
+            Experimental models are evaluated but excluded from decisions.
+        </div>
+
+        <h4 class="section-title">Participating Models</h4>
+    `;
+
+    data.model_predictions.forEach(m => {
+        let conf = parseFloat(m.confidence);
+        let isCNN = m.model === "CNN";
+        let level = conf >= 70 ? "high" : "low";
+        let color = isCNN ? "amber" : "green";
+
+        if (!isCNN) {
+            html += `
+            <div class="model-card ${level}">
+                <b>${m.model}</b>: ${m.category} (${m.confidence})
+                <div class="confidence-bar">
+                    <div class="confidence-fill ${color}" style="width:${conf}%"></div>
+                </div>
+            </div>
+            `;
+        }
+    });
+
+    html += `<h4 class="section-title muted">Experimental / Non-voting</h4>`;
+
+    data.model_predictions.forEach(m => {
+        if (m.model === "CNN") {
+            let conf = parseFloat(m.confidence);
+            html += `
+            <div class="model-card low">
+                <b>CNN (Experimental)</b><br>
+                Confidence below threshold (${m.confidence})
+                <div class="confidence-bar">
+                    <div class="confidence-fill amber" style="width:${conf}%"></div>
+                </div>
+                <div class="cnn-note">
+                    Excluded from final decision due to low confidence
+                </div>
+            </div>
+            `;
+        }
+    });
+
+    document.getElementById("result").innerHTML = html;
+}
+</script>
+
+</body>
+</html>
