@@ -1,206 +1,130 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Customer Support Ticket Classifier</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+# Customer Support Ticket Classifier
 
-    <style>
-        body {
-            font-family: Arial, Helvetica, sans-serif;
-            background-color: #f8f9fa;
-            color: #212529;
-            line-height: 1.6;
-            margin: 0;
-            padding: 0;
-        }
+## Project Overview
 
-        .container {
-            max-width: 1000px;
-            margin: 40px auto;
-            background: #ffffff;
-            padding: 40px;
-            border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.08);
-        }
+The **Customer Support Ticket Classifier** is an end-to-end NLP-based machine learning system designed to automatically categorize customer support tickets into predefined classes such as *Billing, Refund, Technical Issue, Account, Delivery/Service,* and *General Inquiry*. The system leverages an **ensemble of classical ML and deep learning models**, combined with confidence-aware decision logic and a real-time web interface.
 
-        h1, h2, h3 {
-            color: #0d6efd;
-        }
+This project demonstrates **production-style ML thinking**, not just model training — including preprocessing pipelines, model comparison, confidence thresholds, explainable outputs, and deployment readiness.
 
-        h1 {
-            text-align: center;
-            margin-bottom: 10px;
-        }
+---
 
-        .subtitle {
-            text-align: center;
-            color: #6c757d;
-            margin-bottom: 30px;
-        }
+## Business Problem
 
-        ul {
-            margin-left: 20px;
-        }
+Customer support teams handle large volumes of unstructured text tickets daily. Manual categorization is:
 
-        li {
-            margin-bottom: 10px;
-        }
+* Time-consuming
+* Error-prone
+* Not scalable
 
-        code {
-            background: #f1f3f5;
-            padding: 4px 6px;
-            border-radius: 4px;
-            font-size: 0.95em;
-        }
+This system automates ticket classification to:
 
-        .badge {
-            display: inline-block;
-            padding: 6px 10px;
-            background: #e9ecef;
-            border-radius: 6px;
-            margin: 4px 4px 4px 0;
-            font-size: 0.9em;
-        }
+* Reduce response time
+* Improve routing accuracy
+* Enable data-driven insights through clustering
 
-        .highlight {
-            background: #e7f5ff;
-            border-left: 4px solid #0d6efd;
-            padding: 15px;
-            margin: 20px 0;
-        }
 
-        .warning {
-            background: #fff3cd;
-            border-left: 4px solid #ffc107;
-            padding: 15px;
-            margin: 20px 0;
-        }
 
-        .success {
-            background: #e6fcf5;
-            border-left: 4px solid #12b886;
-            padding: 15px;
-            margin: 20px 0;
-        }
+##  Solution Architecture
 
-        footer {
-            text-align: center;
-            color: #6c757d;
-            font-size: 0.9em;
-            margin-top: 40px;
-        }
-    </style>
-</head>
+### Models Used
 
-<body>
-<div class="container">
+* **Logistic Regression (TF-IDF + PCA)** – Baseline, interpretable model
+* **Support Vector Machine (SVM)** – High-accuracy linear classifier
+* **Artificial Neural Network (ANN)** – Dense neural network for non-linear patterns
+* **Convolutional Neural Network (CNN)** – Experimental deep learning model
+* **KMeans Clustering** – Unsupervised grouping for pattern discovery
 
-    <h1>Customer Support Ticket Classifier</h1>
-    <p class="subtitle">
-        End-to-End NLP-Based Classification System with Ensemble Learning & Confidence-Aware Decision Logic
-    </p>
+### Decision Strategy
 
-    <h2>📌 Project Overview</h2>
-    <p>
-        This project is an end-to-end machine learning system designed to automatically classify
-        customer support tickets into predefined categories such as
-        <strong>Billing, Refund, Technical Issue, Account, Delivery/Service,</strong> and
-        <strong>General Inquiry</strong>.
-    </p>
-    <p>
-        The system combines classical machine learning models and deep learning models,
-        integrates unsupervised clustering for insight discovery,
-        and deploys a confidence-aware ensemble strategy to ensure reliable predictions.
-    </p>
+* Only **high-confidence models (≥ 70%)** participate in final prediction
+* Final output is generated using **majority voting (ANN + SVM)**
+* CNN is treated as an **experimental, non-voting model** for research comparison
 
-    <h2>🎯 Business Problem</h2>
-    <ul>
-        <li>Manual ticket classification is slow, inconsistent, and does not scale.</li>
-        <li>Incorrect routing increases resolution time and customer dissatisfaction.</li>
-        <li>Support teams need a reliable, automated categorization system.</li>
-    </ul>
 
-    <h2>🧠 Solution Architecture</h2>
-    <ul>
-        <li>Text preprocessing with cleaning, normalization, and TF-IDF vectorization</li>
-        <li>Dimensionality reduction using PCA</li>
-        <li>Multiple supervised classification models</li>
-        <li>Unsupervised clustering for ticket pattern analysis</li>
-        <li>Confidence-based ensemble voting for final decision</li>
-    </ul>
+##  Data Preprocessing Pipeline
 
-    <h2>⚙️ Models Implemented</h2>
-    <div class="badge">Logistic Regression (TF-IDF + PCA)</div>
-    <div class="badge">Support Vector Machine (TF-IDF + PCA)</div>
-    <div class="badge">Artificial Neural Network (Dense)</div>
-    <div class="badge">1D CNN (Experimental)</div>
-    <div class="badge">K-Means Clustering</div>
+* Text cleaning (lowercasing, punctuation removal, whitespace normalization)
+* TF-IDF vectorization
+* Dimensionality reduction using PCA
+* Label encoding for supervised learning
+* One-hot encoding for deep learning models
 
-    <h2>📊 Model Performance Summary</h2>
-    <ul>
-        <li><strong>SVM & ANN:</strong> ~99% accuracy with high confidence and consistent predictions</li>
-        <li><strong>Logistic Regression:</strong> Strong baseline performance (~98–99%)</li>
-        <li><strong>CNN:</strong> Lower confidence due to TF-IDF features and limited dataset</li>
-    </ul>
 
-    <div class="highlight">
-        <strong>Key Design Decision:</strong><br>
-        Only models exceeding a confidence threshold participate in the final prediction.
-        Experimental models (CNN) are evaluated but excluded from voting when confidence is low.
-    </div>
 
-    <h2>🧪 Why CNN Was Included</h2>
-    <div class="warning">
-        CNN was intentionally included as an experimental deep learning baseline.
-        While CNNs excel with word embeddings and large datasets,
-        they underperformed with TF-IDF features and limited data.
-        <br><br>
-        Instead of removing it, a confidence-aware exclusion mechanism was implemented,
-        reflecting real-world ML system design.
-    </div>
+## Model Performance (Highlights)
 
-    <h2>🗳️ Final Decision Logic</h2>
-    <ul>
-        <li>Models with confidence ≥ threshold participate in voting</li>
-        <li>Final prediction is chosen via majority vote</li>
-        <li>CNN predictions are displayed transparently but excluded when unreliable</li>
-    </ul>
+* **SVM Accuracy:** ~99%
+* **ANN Accuracy:** ~99%
+* Logistic Regression performs strongly as a baseline
+* CNN shows lower confidence and is intentionally excluded from production decisions
 
-    <div class="success">
-        <strong>Final Output:</strong><br>
-        Reliable category prediction + model-wise confidence + cluster assignment
-    </div>
+> Performance metrics are used selectively to ensure robustness and avoid overfitting bias.
 
-    <h2>🖥️ Web Application</h2>
-    <ul>
-        <li>Flask-based REST API</li>
-        <li>Interactive HTML/CSS/JavaScript frontend</li>
-        <li>Visual confidence bars for each model</li>
-        <li>Clear explanation of decision logic</li>
-    </ul>
+##  Web Application (Demo)
 
-    <h2>📁 Tech Stack</h2>
-    <ul>
-        <li><strong>Languages:</strong> Python, HTML, CSS, JavaScript</li>
-        <li><strong>ML:</strong> Scikit-learn, TensorFlow / Keras</li>
-        <li><strong>NLP:</strong> TF-IDF, PCA</li>
-        <li><strong>Backend:</strong> Flask</li>
-        <li><strong>Deployment:</strong> Local / Docker-ready</li>
-    </ul>
+### Features
 
-    <h2>🚀 Key Takeaways</h2>
-    <ul>
-        <li>Demonstrates real-world ML decision-making</li>
-        <li>Balances accuracy with reliability</li>
-        <li>Shows ability to justify model selection</li>
-        <li>Highlights production-oriented thinking</li>
-    </ul>
+* Clean, recruiter-friendly UI
+* Real-time ticket classification
+* Confidence bars for each model
+* Clear distinction between **participating** and **experimental** models
+* Explanation of decision logic
 
-    <footer>
-        Built as part of an AI/ML internship & portfolio project
-    </footer>
+### Tech Stack
 
-</div>
-</body>
-</html>
+* **Backend:** Flask, TensorFlow, scikit-learn
+* **Frontend:** HTML, CSS, JavaScript
+* **API:** REST-based /predict endpoint
+
+
+## Project Structure
+
+
+project-root/
+│
+├── app.py                  # Flask backend
+├── models/                 # Trained models & encoders
+│   ├── ann_model.h5
+│   ├── cnn_model.h5
+│   ├── svm_model.pkl
+│   ├── logreg_model.pkl
+│   ├── label_encoder.pkl
+│   ├── tfidf.pkl
+│   ├── pca.pkl
+│   └── kmeans_model.pkl
+│
+├── data/processed/          # Feature arrays
+│   ├── X_features.npy
+│   └── y_labels.npy
+│
+├── templates/
+│   └── index.html           # UI
+│
+├── static/                  # CSS / JS
+├── README.md
+└── requirements.txt
+
+## 🚀 How to Run the Project
+
+### 1️. Install Dependencies
+### 2️. Start the Flask Server
+### 3. Open the Web App
+
+
+## Key Design Decisions
+
+* CNN retained for **architectural experimentation**, not blind accuracy
+* Confidence-based filtering avoids unreliable predictions
+* Ensemble approach improves robustness over single-model systems
+* UI explicitly communicates trust and transparency
+
+
+## Future Improvements
+
+* Replace CNN with Transformer-based models (BERT)
+* Add active learning for low-confidence tickets
+* Deploy using Docker + cloud hosting
+* Add monitoring for model drift
+
+
+> This project is intentionally designed to reflect real-world ML engineering practices rather than academic-only modeling.
