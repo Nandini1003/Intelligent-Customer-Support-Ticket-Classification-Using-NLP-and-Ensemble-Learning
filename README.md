@@ -104,13 +104,19 @@ project-root/
 ├── README.md
 └── requirements.txt
 
-
+````
 
 
 ## How to Run the Project
 
 ### 1️. Install Dependencies
+```text 
+pip install -r requirements.txt
+```
 ### 2️. Start the Flask Server
+```
+python app.py
+```
 ### 3. Open the Web App
 
 
