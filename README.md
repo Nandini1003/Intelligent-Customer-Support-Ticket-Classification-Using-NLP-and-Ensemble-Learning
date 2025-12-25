@@ -1,8 +1,8 @@
-# Customer Support Ticket Classifier
+# Intelligent Customer Support Ticket Classification 
 
 ## Project Overview
 
-The **Customer Support Ticket Classifier** is an end-to-end NLP-based machine learning system designed to automatically categorize customer support tickets into predefined classes such as *Billing, Refund, Technical Issue, Account, Delivery/Service,* and *General Inquiry*. The system leverages an **ensemble of classical ML and deep learning models**, combined with confidence-aware decision logic and a real-time web interface.
+The **Intelligent Customer Support Ticket Classification ** is an end-to-end NLP-based machine learning system designed to automatically categorize customer support tickets into predefined classes such as *Billing, Refund, Technical Issue, Account, Delivery/Service,* and *General Inquiry*. The system leverages an **ensemble of classical ML and deep learning models**, combined with confidence-aware decision logic and a real-time web interface.
 
 This project demonstrates **production-style ML thinking**, not just model training — including preprocessing pipelines, model comparison, confidence thresholds, explainable outputs, and deployment readiness.
 
@@ -76,14 +76,13 @@ This system automates ticket classification to:
 * **Frontend:** HTML, CSS, JavaScript
 * **API:** REST-based /predict endpoint
 
-
 ## Project Structure
 
-
+```text
 project-root/
 │
-├── app.py                  # Flask backend
-├── models/                 # Trained models & encoders
+├── app.py                      # Flask backend
+├── models/                     # Trained models & encoders
 │   ├── ann_model.h5
 │   ├── cnn_model.h5
 │   ├── svm_model.pkl
@@ -93,18 +92,22 @@ project-root/
 │   ├── pca.pkl
 │   └── kmeans_model.pkl
 │
-├── data/processed/          # Feature arrays
-│   ├── X_features.npy
-│   └── y_labels.npy
+├── data/
+│   └── processed/              # Feature arrays
+│       ├── X_features.npy
+│       └── y_labels.npy
 │
 ├── templates/
-│   └── index.html           # UI
+│   └── index.html              # UI
 │
-├── static/                  # CSS / JS
+├── static/                     # CSS / JS
 ├── README.md
 └── requirements.txt
 
-## 🚀 How to Run the Project
+
+
+
+## How to Run the Project
 
 ### 1️. Install Dependencies
 ### 2️. Start the Flask Server
